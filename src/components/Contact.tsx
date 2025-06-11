@@ -22,7 +22,7 @@ const Contact = () => {
   const [showSuccess, setShowSuccess] = useState(false);
 
   const openWhatsApp = (message?: string) => {
-    const whatsappNumber = '01019383610';
+    const whatsappNumber = '201019383610';
     const whatsappMessage = message || 'Hi, I would like to connect with you!';
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
     window.open(whatsappUrl, '_blank');
@@ -39,7 +39,7 @@ const Contact = () => {
     await new Promise(resolve => setTimeout(resolve, 800));
     
     // Create WhatsApp URL with your number
-    const whatsappUrl = `https://wa.me/01019383610?text=${encodeURIComponent(whatsappMessage)}`;
+    const whatsappUrl = `https://wa.me/201019383610?text=${encodeURIComponent(whatsappMessage)}`;
     
     // Open WhatsApp
     window.open(whatsappUrl, '_blank');
