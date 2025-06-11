@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ChevronDown, Github, Linkedin, Mail } from 'lucide-react';
 import Model3D from './Model3D';
