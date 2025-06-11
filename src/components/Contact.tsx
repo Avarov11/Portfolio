@@ -1,6 +1,14 @@
 import React, { useState, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { Mail, Phone, MapPin, Send, GraduationCap, Briefcase } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, GraduationCap, Briefcase, MessageCircle, Loader2 } from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
+
+interface ContactInfoItem {
+  icon: LucideIcon;
+  title: string;
+  value: string;
+  href: string;
+}
 
 const Contact = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -10,11 +18,43 @@ const Contact = () => {
     email: '',
     message: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const openWhatsApp = (message?: string) => {
+    const whatsappNumber = '01019383610';
+    const whatsappMessage = message || 'Hi, I would like to connect with you!';
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log('Form submitted:', formData);
+    setIsSubmitting(true);
+    
+    // Format the message for WhatsApp
+    const whatsappMessage = `*New Portfolio Contact*\n\n*Name:* ${formData.name}\n*Email:* ${formData.email}\n*Message:* ${formData.message}`;
+    
+    // Simulate a small delay for better UX
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Create WhatsApp URL with your number
+    const whatsappUrl = `https://wa.me/01019383610?text=${encodeURIComponent(whatsappMessage)}`;
+    
+    // Open WhatsApp
+    window.open(whatsappUrl, '_blank');
+    
+    // Show success message and reset
+    setShowSuccess(true);
+    setTimeout(() => {
+      setFormData({
+        name: '',
+        email: '',
+        message: ''
+      });
+      setIsSubmitting(false);
+      setShowSuccess(false);
+    }, 2000);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -24,7 +64,7 @@ const Contact = () => {
     });
   };
 
-  const contactInfo = [
+  const contactInfo: ContactInfoItem[] = [
     {
       icon: Mail,
       title: "Email",
@@ -73,7 +113,7 @@ const Contact = () => {
             Get In Touch
           </h2>
           <p className="text-xl text-secondary-600 max-w-3xl mx-auto">
-            Ready to collaborate on your next project? Let's discuss how I can help bring your ideas to life.
+            Ready to collaborate? Send me a message directly through WhatsApp!
           </p>
         </motion.div>
 
@@ -153,11 +193,36 @@ const Contact = () => {
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl shadow-xl hover-glow">
+            <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl shadow-xl hover-glow relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-green-400 to-green-600" />
+              
+              <div className="flex items-center justify-center mb-6">
+                <MessageCircle className="text-green-500 w-8 h-8 mr-2" />
+                <h3 className="text-xl font-semibold text-gray-800">
+                  Message via WhatsApp
+                </h3>
+              </div>
+
+              {showSuccess && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-95 rounded-2xl"
+                >
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <MessageCircle className="text-white" size={32} />
+                    </div>
+                    <h3 className="text-xl font-semibold text-green-500 mb-2">Opening WhatsApp!</h3>
+                    <p className="text-secondary-600">Redirecting you to continue the conversation...</p>
+                  </div>
+                </motion.div>
+              )}
+              
               <div className="space-y-6">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-secondary-700 mb-2">
-                    Name
+                    Your Name
                   </label>
                   <input
                     type="text"
@@ -166,14 +231,15 @@ const Contact = () => {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-                    placeholder="Your name"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                    placeholder="John Doe"
+                    disabled={isSubmitting}
                   />
                 </div>
 
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-secondary-700 mb-2">
-                    Email
+                    Your Email
                   </label>
                   <input
                     type="email"
@@ -182,14 +248,15 @@ const Contact = () => {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-                    placeholder="your@email.com"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                    placeholder="john@example.com"
+                    disabled={isSubmitting}
                   />
                 </div>
 
                 <div>
                   <label htmlFor="message" className="block text-sm font-medium text-secondary-700 mb-2">
-                    Message
+                    Your Message
                   </label>
                   <textarea
                     id="message"
@@ -197,21 +264,34 @@ const Contact = () => {
                     value={formData.message}
                     onChange={handleChange}
                     required
-                    rows={5}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all resize-none"
-                    placeholder="Tell me about your project or opportunity..."
+                    rows={4}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                    placeholder="Hi! I'd like to discuss a project..."
+                    disabled={isSubmitting}
                   />
                 </div>
 
-                <motion.button
+                <button
                   type="submit"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full bg-gradient-primary text-white py-3 px-6 rounded-lg font-semibold hover:shadow-lg transition-all flex items-center justify-center space-x-2 hover-glow"
+                  disabled={isSubmitting}
+                  className="w-full bg-green-500 hover:bg-green-600 text-white py-4 px-6 rounded-lg font-semibold transition-all flex items-center justify-center space-x-2 disabled:opacity-70 disabled:hover:bg-green-500"
                 >
-                  <Send size={18} />
-                  <span>Send Message</span>
-                </motion.button>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span>Opening WhatsApp...</span>
+                    </>
+                  ) : (
+                    <>
+                      <MessageCircle className="w-5 h-5" />
+                      <span>Send via WhatsApp</span>
+                    </>
+                  )}
+                </button>
+
+                <p className="text-sm text-gray-500 text-center mt-4">
+                  Your message will open in WhatsApp, where we can continue the conversation
+                </p>
               </div>
             </form>
           </motion.div>

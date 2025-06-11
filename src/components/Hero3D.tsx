@@ -107,12 +107,14 @@ const Hero3D = () => {
             >
               {[
                 { icon: Github, href: '#', label: 'GitHub' },
-                { icon: Linkedin, href: '#', label: 'LinkedIn' },
+                { icon: Linkedin, href: 'https://www.linkedin.com/in/youssef-farid-351945283/', label: 'LinkedIn' },
                 { icon: Mail, href: 'mailto:youssef.farid13003@gmail.com', label: 'Email' },
               ].map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
+                  target={social.href.startsWith('http') ? '_blank' : undefined}
+                  rel={social.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                   className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-600 hover:text-primary-600 hover:shadow-xl transition-all"
                 >
                   <social.icon size={20} />
