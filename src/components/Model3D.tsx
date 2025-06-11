@@ -1,4 +1,4 @@
-import React, { Suspense, useRef } from 'react';
+import { Suspense, useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF, OrbitControls, Environment, ContactShadows, useProgress } from '@react-three/drei';
 import { motion } from 'framer-motion';
@@ -21,6 +21,15 @@ function Model({
 }) {
   const { scene } = useGLTF(modelPath);
   const modelRef = useRef<any>();
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useFrame(() => {
     if (autoRotate && modelRef.current) {
@@ -32,8 +41,8 @@ function Model({
     <primitive
       ref={modelRef}
       object={scene}
-      scale={scale}
-      position={[0, -1.2, 0]} // fine-tuned for desktop eye-level view
+      scale={isMobile ? scale * 0.8 : scale} // Slightly smaller on mobile
+      position={[0, isMobile ? -0.8 : -1.2, 0]} // Adjusted position for mobile
     />
   );
 }
@@ -41,7 +50,7 @@ function Model({
 function LoaderFallback() {
   const { progress } = useProgress();
   return (
-    <div className="flex items-center justify-center h-96">
+    <div className="flex items-center justify-center h-full">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
       <span className="ml-4 text-primary-600 font-medium">{Math.floor(progress)}%</span>
     </div>
@@ -50,7 +59,7 @@ function LoaderFallback() {
 
 const Model3D: React.FC<Model3DProps> = ({
   modelPath,
-  className = 'w-full h-[500px]',
+  className = 'w-full h-full',
   autoRotate = true,
   scale = 1,
 }) => {
@@ -63,7 +72,7 @@ const Model3D: React.FC<Model3DProps> = ({
     >
       <Suspense fallback={<LoaderFallback />}>
         <Canvas
-          camera={{ position: [0, 0, 10], fov: 45 }}  // ⬅️ move Z to 7 or 8
+          camera={{ position: [0, 0, 8], fov: 45 }}
           style={{ background: 'transparent' }}
         >
           <ambientLight intensity={0.5} />

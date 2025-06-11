@@ -67,24 +67,12 @@ const Hero3D = () => {
       className="min-h-screen flex items-center justify-center relative overflow-hidden"
     >
       <div
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full"
         ref={heroRef}
       >
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Side - Text and Buttons */}
           <div className="text-center lg:text-left">
-            <div className="mb-8 lg:hidden">
-              <div className="w-32 h-32 mx-auto mb-8 rounded-full bg-gradient-to-r from-primary-400 to-purple-500 p-1">
-                <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
-                  <img
-                    src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=400"
-                    alt="Youssef Walaa Fikry"
-                    className="w-28 h-28 rounded-full object-cover"
-                  />
-                </div>
-              </div>
-            </div>
-
             <h1
               ref={titleRef}
               className="text-4xl md:text-6xl lg:text-7xl font-bold font-display mb-6 gradient-text"
@@ -134,8 +122,8 @@ const Hero3D = () => {
           </div>
 
           {/* Right Side - 3D Model */}
-          <div className="hidden lg:block">
-            <div className="w-full h-[500px]">
+          <div className="order-first lg:order-last">
+            <div className="w-full h-[300px] sm:h-[400px] lg:h-[500px]">
               <Model3D
                 modelPath="/models/your-model.glb"
                 className="w-full h-full"
