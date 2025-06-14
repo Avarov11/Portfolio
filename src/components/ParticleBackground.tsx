@@ -1,28 +1,39 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 
 const ParticleBackground = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [shouldRender, setShouldRender] = useState(true);
 
   useEffect(() => {
+    // Check if device can handle particles
+    const isMobile = window.innerWidth < 768;
+    const isLowPerformance = navigator.hardwareConcurrency <= 4;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    
+    if (isMobile || isLowPerformance || prefersReducedMotion) {
+      setShouldRender(false);
+      return;
+    }
+
     const container = containerRef.current;
     if (!container) return;
 
-    // Create particles with new colors
-    const particleCount = 50;
+    // Reduce particle count for better performance
+    const particleCount = isMobile ? 20 : 30;
     const particles: HTMLDivElement[] = [];
 
     for (let i = 0; i < particleCount; i++) {
       const particle = document.createElement('div');
       
-      // Alternate between the two main colors
       const isPrimary = i % 2 === 0;
-      const color = isPrimary ? 'rgba(191, 35, 202, 0.15)' : 'rgba(31, 23, 85, 0.15)';
+      const color = isPrimary ? 'rgba(191, 35, 202, 0.08)' : 'rgba(31, 23, 85, 0.08)';
       
-      particle.className = 'absolute rounded-full';
+      particle.className = 'absolute rounded-full pointer-events-none';
       particle.style.background = color;
+      particle.style.willChange = 'transform, opacity';
       
-      const size = Math.random() * 4 + 2;
+      const size = Math.random() * 3 + 1;
       particle.style.width = `${size}px`;
       particle.style.height = `${size}px`;
       particle.style.left = `${Math.random() * 100}%`;
@@ -31,30 +42,19 @@ const ParticleBackground = () => {
       container.appendChild(particle);
       particles.push(particle);
 
-      // Animate particles
+      // Simplified animations for better performance
       gsap.to(particle, {
-        y: -100,
-        x: Math.random() * 100 - 50,
-        duration: Math.random() * 10 + 10,
+        y: -50,
+        x: Math.random() * 50 - 25,
+        duration: Math.random() * 15 + 10,
         repeat: -1,
         ease: "none",
         delay: Math.random() * 5
       });
 
       gsap.to(particle, {
-        opacity: Math.random() * 0.6 + 0.2,
-        duration: Math.random() * 3 + 2,
-        repeat: -1,
-        yoyo: true,
-        ease: "power2.inOut"
-      });
-
-      // Add subtle glow effect
-      gsap.to(particle, {
-        boxShadow: isPrimary 
-          ? `0 0 ${Math.random() * 10 + 5}px rgba(191, 35, 202, 0.3)`
-          : `0 0 ${Math.random() * 10 + 5}px rgba(31, 23, 85, 0.3)`,
-        duration: Math.random() * 2 + 1,
+        opacity: Math.random() * 0.4 + 0.1,
+        duration: Math.random() * 4 + 3,
         repeat: -1,
         yoyo: true,
         ease: "power2.inOut"
@@ -69,6 +69,10 @@ const ParticleBackground = () => {
       });
     };
   }, []);
+
+  if (!shouldRender) {
+    return null;
+  }
 
   return (
     <div
